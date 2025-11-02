@@ -11,6 +11,7 @@
         "xiosbase": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "iostream": "cpp"
     }
 }

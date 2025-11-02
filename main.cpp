@@ -23,22 +23,17 @@ microseconds Read(list<string>& list, ifstream& input);
 microseconds Read(set<string>& set, ifstream& input);
 microseconds Read(vector<string>& vect, ifstream& input);
 
-//modify to 2d array to store multiple times
 microseconds TimeSort(vector<string>& vector);
 microseconds TimeSort(list<string>& list);
 
-//modify to 2d array to store multiple times
 microseconds TimeInsert(vector<string>& vector, int index, string value);
 microseconds TimeInsert(set<string>& set, string value);
 microseconds TimeInsert(list<string>& list, int index, string value);
 
-//modify to 2d array to store multiple times
 microseconds TimeDelete(vector<string>& vector, int index);
 microseconds TimeDelete(set<string>& set, int index);
 microseconds TimeDelete(list<string>& list, int index);
 
-//modify to 2d array to store multiple times
-vector<microseconds> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename);
 vector<microseconds> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename);
 vector<microseconds> SortRace(list<string>& list, vector<string>& vect);
 vector<microseconds> InsertRace(list<string>&list, vector<string>& vect, set<string>& set, string value);
@@ -86,15 +81,15 @@ int main() {
         race = SortRace(list, vect);
         for (int dataType = 0; dataType < race.size(); dataType++) {
             races.at(SORT).at(dataType).push_back(race.at(dataType));
-        }
-        
+        } 
     }
 
-    vector<string> raceNames = {"Read", "Sort", "Insert", "Delete"};
-
-    //Outputs table contents
+    //Output header rows
     cout << "Number of simulations: " << TESTS << endl;
     OutputRace({"Operation", "List", "Vector", "Set"});
+    
+    //Outputs table contents
+    vector<string> raceNames = {"Read", "Sort", "Insert", "Delete"};
     for (int raceType = 0; raceType < races.size(); raceType++) {
         OutputRace(races.at(raceType), raceNames.at(raceType));
     }
