@@ -44,33 +44,21 @@ vector<vector<microseconds>> DeleteRace(list<string>&list, vector<string>& vect,
 void OutputRace(vector<microseconds> durations, string raceName, int spacing = DEFAULT_SPACING);
 void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
-
-vector<vector<microseconds>> TestReadRace(list<string>& testList, string filename, int tests) {
-    vector<vector<microseconds>> durations(3);
-    
-    //Verify file opens properly
-    ifstream infile;
-    infile.open(filename);
-    if (!infile.is_open()) {
-        cout << "Error opening file " << filename << endl;
-        throw ios_base::failure("File open error");
-    }
-    
+/**
+ * Calls read race function multiple times and appends each resulting time to a compiled 2d vector of all durations
+ */
+vector<vector<microseconds>> TestReadRace(list<string>& testList, vector<string>& testVect, set<string>& testSet, string filename, int tests) {
+    vector<vector<microseconds>> compiledDurations(3);
     for (int i = 0; i < tests; i++) {
-        list<string> dummyList;
-        vector<string> dummyVect;
-        set<string> dummySet;
-
-        //Time read operation for the list
-        //Use a dummy list for repeat tests
-        durations.at(0).push_back(Read((i == 0 ? testList : dummyList), infile)); 
-        //Reset file stream to beginning
-        infile.clear();
-        infile.seekg(0);
+        //call the race and input into a dummy vector
+        vector<vector<microseconds>> durations = ReadRace(testList, testVect, testSet, filename, 1);
+        
+        //add the result of each race into compiled durations vector
+        for (int j = 0; j < durations.size(); j++) {
+            compiledDurations.at(j).push_back(durations.at(j).front());
+        }
     }
-    infile.close();
-
-    return durations;
+    return compiledDurations;
 }
 
 int main() {
