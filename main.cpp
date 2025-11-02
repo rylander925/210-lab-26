@@ -119,13 +119,10 @@ int main() {
             for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
                 //average out durations for each test
                 long long averageDuration = 0;
-                cout << "{";
                 for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
                     long long duration = races.at(raceType).at(datatype).at(i).count();
-                    cout << duration << ", ";
                     averageDuration += duration;
                 }
-                cout << "}";
 
                 //if the duration is negative, it has been set to a fixed value, so set to -1
                 if (averageDuration < 0) {
