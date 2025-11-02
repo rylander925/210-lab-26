@@ -50,6 +50,7 @@ int main() {
     const int SORT_TESTS = 2;
     const int INSERTION_TESTS = 2;
     const int DELETION_TESTS = 2;
+    const int SPACING = 15;
 
     list<string> list;
     set<string> set;
@@ -72,37 +73,32 @@ int main() {
     races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
     races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
 
+    OutputRace({"Operation", "List", "Vector", "Set"});
+
     for (int raceType = 0; raceType < races.size(); raceType++) {
         switch (raceType) {
             case 0:
-                cout << "Read:" << endl;
+                cout << setw(SPACING) <<  left << "Read:";
                 break; 
             case 1:
-                cout << "Sort:" << endl;
+                cout << setw(SPACING) <<  left << "Sort:";
                 break;
             case 2:
-                cout << "Insert:" << endl;
+                cout << setw(SPACING) <<  left << "Insert:";
                 break;
             case 3:
-                cout << "Delete:" << endl;
+                cout << setw(SPACING) <<  left << "Delete:";
                 break;
         }
         for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
-            switch (datatype) {
-                case 0:
-                    cout << "\tList:" << endl;
-                    break; 
-                case 1:
-                    cout << "\tVector:" << endl;
-                    break;
-                case 2:
-                    cout << "\tSet:" << endl;
-                    break;
-            }
+            long long averageDuration = 0;
             for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
-                cout << "\t\t" << races.at(raceType).at(datatype).at(i).count() << endl;
+                averageDuration += races.at(raceType).at(datatype).at(i).count();
             }
+            averageDuration /= races.at(raceType).at(datatype).size();
+            cout << setw(SPACING) << left << averageDuration;
         }
+        cout << endl;
     }
 
     return 0;
@@ -462,7 +458,7 @@ vector<microseconds> TimeDelete(set<string>& testSet, int index, int tests) {
         //iterate through set to the specified location before starting timer
         set<string>::iterator location = testSet.begin();
         for (int i = 0; i < index; i++) location++;
-        
+
         //start timer and time delete operations based on number of tests
         auto start = high_resolution_clock::now();
         testSet.erase(location);
@@ -512,6 +508,7 @@ vector<microseconds> TimeDelete(list<string>& l, int index, int tests) {
         //iterate through list to the specified location; does not start timer
         list<string>::iterator location = l.begin();
         for (int i = 0; i < index; i++) location++;
+
         //starts timer and times delete operations
         auto start = high_resolution_clock::now();
         l.erase(location);
