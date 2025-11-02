@@ -49,15 +49,21 @@ vector<vector<microseconds>> DeleteRace(list<string>&list, vector<string>& vect,
  * @param tests Number of times to repeat test
  * @return Vector of sorting durations, ordered list, vector, set
  */
-vector<vector<microseconds>> TestSortRace(list<string>& list, vector<string>& vect, int tests) {
+vector<vector<microseconds>> TestSortRace(list<string>& testList, vector<string>& testVector, int tests) {
     enum DATATYPES {LIST, VECTOR, SET};
     vector<vector<microseconds>> compiledDurations(3);
 
     //Run timers and add to vector of compiled durations. The third parameter is set to -1 for a set
     for (int i = 0; i < tests; i++) {
-        list<string> dummyList = list;
-        compiledDurations.at(LIST).push_back(TimeSort(list, 1).front());
-        compiledDurations.at(VECTOR).push_back(TimeSort(vect, 1).front());
+        if (i == (tests - 1)) { //run on parameter lists for the last test
+            compiledDurations.at(LIST).push_back(TimeSort(testList, 1).front());
+            compiledDurations.at(VECTOR).push_back(TimeSort(testVector, 1).front());
+        } else {                //copy unsorted lists and run on dummy lists for other tests
+            list<string> dummyList = testList;
+            vector<string> dummyVector = testVector;
+            compiledDurations.at(LIST).push_back(TimeSort(dummyList, 1).front());
+            compiledDurations.at(VECTOR).push_back(TimeSort(dummyVector, 1).front());
+        }
         compiledDurations.at(SET).push_back(microseconds(-1));
     }
     
@@ -69,9 +75,9 @@ void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
 int main() {
     const string FILENAME = "codes.txt";
-    const int TESTS = 1;
+    const int TESTS = 5;
     const int READ_TESTS = 15;
-    const int SORT_TESTS = 15;
+    const int SORT_TESTS = 1;
     const int INSERTION_TESTS = 1;
     const int DELETION_TESTS = 1;
     const int SPACING = 15;
