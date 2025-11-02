@@ -73,6 +73,9 @@ int main() {
 
     //2D array to store the results of each race
     vector<microseconds> race(3);
+
+    //Run each test race multiple times and save results to 3D array
+    //Yielded more consistent times than looping within each race function
     for (int i = 0; i < TESTS; i++) {
         //Runs races and store in 3D array
         race = ReadRace(list, vect, set, FILENAME);
@@ -99,43 +102,44 @@ int main() {
         }
     }
 
+    //Outputs a header column (uses output function that takes array rows as input)
     OutputRace({"Operation", "List", "Vector", "Set"});
 
-        for (int raceType = 0; raceType < races.size(); raceType++) {
-            switch (raceType) {
-                case 0:
-                    cout << setw(SPACING) <<  left << "Read:";
-                    break; 
-                case 1:
-                    cout << setw(SPACING) <<  left << "Sort:";
-                    break;
-                case 2:
-                    cout << setw(SPACING) <<  left << "Insert:";
-                    break;
-                case 3:
-                    cout << setw(SPACING) <<  left << "Delete:";
-                    break;
-            }
-            for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
-                //average out durations for each test
-                long long averageDuration = 0;
-                for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
-                    long long duration = races.at(raceType).at(datatype).at(i).count();
-                    averageDuration += duration;
-                }
-
-                //if the duration is negative, it has been set to a fixed value, so set to -1
-                if (averageDuration < 0) {
-                    averageDuration = -1;
-                } else {
-                    //otherwise calculate average as normal
-                    //note integer division; since durations are generally long, will not matter much
-                    averageDuration /= races.at(raceType).at(datatype).size();
-                }
-                cout << setw(SPACING) << left << averageDuration;
-            }
-            cout << endl;
+    for (int raceType = 0; raceType < races.size(); raceType++) {
+        switch (raceType) {
+            case 0:
+                cout << setw(SPACING) <<  left << "Read:";
+                break; 
+            case 1:
+                cout << setw(SPACING) <<  left << "Sort:";
+                break;
+            case 2:
+                cout << setw(SPACING) <<  left << "Insert:";
+                break;
+            case 3:
+                cout << setw(SPACING) <<  left << "Delete:";
+                break;
         }
+        for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
+            //average out durations for each test
+            long long averageDuration = 0;
+            for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
+                long long duration = races.at(raceType).at(datatype).at(i).count();
+                averageDuration += duration;
+            }
+
+            //if the duration is negative, it has been set to a fixed value, so set to -1
+            if (averageDuration < 0) {
+                averageDuration = -1;
+            } else {
+                //otherwise calculate average as normal
+                //note integer division; since durations are generally long, will not matter much
+                averageDuration /= races.at(raceType).at(datatype).size();
+            }
+            cout << setw(SPACING) << left << averageDuration;
+        }
+        cout << endl;
+    }
         
 
     return 0;
