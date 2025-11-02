@@ -44,6 +44,35 @@ vector<vector<microseconds>> DeleteRace(list<string>&list, vector<string>& vect,
 void OutputRace(vector<microseconds> durations, string raceName, int spacing = DEFAULT_SPACING);
 void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
+
+vector<vector<microseconds>> TestReadRace(list<string>& testList, string filename, int tests) {
+    vector<vector<microseconds>> durations(3);
+    
+    //Verify file opens properly
+    ifstream infile;
+    infile.open(filename);
+    if (!infile.is_open()) {
+        cout << "Error opening file " << filename << endl;
+        throw ios_base::failure("File open error");
+    }
+    
+    for (int i = 0; i < tests; i++) {
+        list<string> dummyList;
+        vector<string> dummyVect;
+        set<string> dummySet;
+
+        //Time read operation for the list
+        //Use a dummy list for repeat tests
+        durations.at(0).push_back(Read((i == 0 ? testList : dummyList), infile)); 
+        //Reset file stream to beginning
+        infile.clear();
+        infile.seekg(0);
+    }
+    infile.close();
+
+    return durations;
+}
+
 int main() {
     const string FILENAME = "codes.txt";
     const int TESTS = 10;
@@ -66,6 +95,11 @@ int main() {
             Final inner layer stores each time
                  
      */
+
+    for (int i = 0; i < 2; i++) {
+        TestReadRace(list, FILENAME, 10);
+    }
+    
     vector<vector<vector<microseconds>>> races(4);
     for (int i = 0; i < TESTS; i++) {
         //Runs races and store in 3D array
@@ -115,6 +149,7 @@ int main() {
             cout << endl;
         }
     }
+        
 
     return 0;
 }
