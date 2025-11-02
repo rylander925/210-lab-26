@@ -16,31 +16,33 @@ using namespace std;
 using namespace chrono;
 
 const int DEFAULT_SPACING = 15;
+enum RACETYPE {READ, SORT, INSERT, DELETE};
+enum DATATYPE {LIST, VECTOR, SET};
 
 microseconds Read(list<string>& list, ifstream& input);
 microseconds Read(set<string>& set, ifstream& input);
 microseconds Read(vector<string>& vect, ifstream& input);
 
 //modify to 2d array to store multiple times
-vector<microseconds> TimeSort(vector<string>& vector, int tests);
-vector<microseconds> TimeSort(list<string>& list, int tests);
+microseconds TimeSort(vector<string>& vector);
+microseconds TimeSort(list<string>& list);
 
 //modify to 2d array to store multiple times
-vector<microseconds> TimeInsert(vector<string>& vector, int index, string value, int tests);
-vector<microseconds> TimeInsert(set<string>& set, string value, int tests);
-vector<microseconds> TimeInsert(list<string>& list, int index, string value, int tests);
+microseconds TimeInsert(vector<string>& vector, int index, string value);
+microseconds TimeInsert(set<string>& set, string value);
+microseconds TimeInsert(list<string>& list, int index, string value);
 
 //modify to 2d array to store multiple times
-vector<microseconds> TimeDelete(vector<string>& vector, int index, int tests);
-vector<microseconds> TimeDelete(set<string>& set, int index, int tests);
-vector<microseconds> TimeDelete(list<string>& list, int index, int tests);
+microseconds TimeDelete(vector<string>& vector, int index);
+microseconds TimeDelete(set<string>& set, int index);
+microseconds TimeDelete(list<string>& list, int index);
 
 //modify to 2d array to store multiple times
-vector<vector<microseconds>> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename);
-vector<vector<microseconds>> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename, int tests);
-vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, int tests);
-vector<vector<microseconds>> InsertRace(list<string>&list, vector<string>& vect, set<string>& set, string value, int tests);
-vector<vector<microseconds>> DeleteRace(list<string>&list, vector<string>& vect, set<string>& set, int tests);
+vector<microseconds> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename);
+vector<microseconds> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename);
+vector<microseconds> SortRace(list<string>& list, vector<string>& vect);
+vector<microseconds> InsertRace(list<string>&list, vector<string>& vect, set<string>& set, string value);
+vector<microseconds> DeleteRace(list<string>&list, vector<string>& vect, set<string>& set);
 
 void OutputRace(vector<microseconds> durations, string raceName, int spacing = DEFAULT_SPACING);
 void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
@@ -67,12 +69,10 @@ int main() {
             Final inner layer stores each time
                  
      */
-
-    
     vector<vector<vector<microseconds>>> races(4, vector<vector<microseconds>>(3));
+
+    //2D array to store the results of each race
     vector<vector<microseconds>> race(3);
-    enum RACETYPE {READ, SORT, INSERT, DELETE};
-    enum DATATYPE {LIST, VECTOR, SET};
     for (int i = 0; i < TESTS; i++) {
         //Runs races and store in 3D array
         race = ReadRace(list, vect, set, FILENAME);
@@ -183,15 +183,14 @@ void OutputRace(vector<microseconds> durations, string raceName, int spacing) {
  * @param testList List to delete from
  * @param vect     Vector to delete from
  * @param set      Set to delete from
- * @param tests    Number of times to repeat test
  * @return Vector containing durations of tests, ordered list, vector, set
  */
-vector<vector<microseconds>> DeleteRace(list<string>&testList, vector<string>& vect, set<string>& set, int tests) {
+vector<microseconds> DeleteRace(list<string>&testList, vector<string>& vect, set<string>& set) {
     //Run timers for each delete operation and return times as an array
-    return vector<vector<microseconds>>
-        {   TimeDelete(testList, testList.size() / 2, tests),
-            TimeDelete(vect, vect.size() / 2, tests),
-            TimeDelete(set, set.size() / 2, tests)
+    return vector<microseconds>
+        {   TimeDelete(testList, testList.size() / 2),
+            TimeDelete(vect, vect.size() / 2),
+            TimeDelete(set, set.size() / 2)
         };
 }
 
@@ -201,15 +200,14 @@ vector<vector<microseconds>> DeleteRace(list<string>&testList, vector<string>& v
  * @param vect     Vector to insert to
  * @param set      Set to insert to
  * @param value    Value to insert
- * @param tests    Number of times to repeat test
  * @return Vector containing durations of tests, ordered list, vector, set
  */
-vector<vector<microseconds>> InsertRace(list<string>&testList, vector<string>& vect, set<string>& set, string value, int tests) {
+vector<microseconds> InsertRace(list<string>&testList, vector<string>& vect, set<string>& set, string value) {
     //Run timers and return as an array
-    return vector<vector<microseconds>>
-        {   TimeInsert(testList, testList.size() / 2, value, tests),
-            TimeInsert(vect, vect.size() / 2, value, tests),
-            TimeInsert(set, value, tests)
+    return vector<microseconds>
+        {   TimeInsert(testList, testList.size() / 2, value),
+            TimeInsert(vect, vect.size() / 2, value),
+            TimeInsert(set, value)
         };
 }
 
@@ -217,49 +215,16 @@ vector<vector<microseconds>> InsertRace(list<string>&testList, vector<string>& v
  * Returns resulting durations from sorting race between a list and vector. Third duration (for a set) is -1.
  * @param list  List to sort
  * @param vect  Vector to sort
- * @param tests Number of times to repeat test
  * @return Vector of sorting durations, ordered list, vector, set
  */
-vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, int tests) {
+vector<microseconds> SortRace(list<string>& list, vector<string>& vect) {
     //Run timers and return as an array. The third parameter is set to negative one for a set
-    return vector<vector<microseconds>>
+    return vector<microseconds>
         {
-            TimeSort(list, tests), 
-            TimeSort(vect, tests), 
-            vector<microseconds>(tests, static_cast<microseconds>(-1)) //initialize a dummy vector and set all times to -1
+            TimeSort(list), 
+            TimeSort(vect), 
+            microseconds(-1) //set sort time to -1 for the set
         };
-}
-
-/**
- * Calls read race function multiple times and appends each resulting time to a compiled 2d vector of all durations
- * Produces more consistent times than looping within the ReadRace function
- * @param testList      List to read to
- * @param testSet       Set to read to
- * @param testVector    Vector to read to
- * @param filename      File to read data from
- * @param tests         Number of times to repeat test
- * @return Vector of durations in microseconds, ordered [0] list, [1] vector, [2] set
- */
-vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVect, set<string>& testSet, string filename, int tests) {
-    vector<vector<microseconds>> compiledDurations(3);
-    for (int i = 0; i < tests; i++) {
-        vector<vector<microseconds>> durations(3);
-
-        if (i == 0) { //input items into parameter list/vector/set the first race
-            durations = ReadRace(testList, testVect, testSet, filename);   //call race function for a single race
-        } else {      //input items into dummy list/vecotr/set for subsequent races
-            list<string> dummyList;
-            vector<string> dummyVector;
-            set<string> dummySet;
-            durations = ReadRace(testList, testVect, testSet, filename);
-        }
-        
-        //add the result of each race into compiled durations vector
-        for (int j = 0; j < durations.size(); j++) {
-            compiledDurations.at(j).push_back(durations.at(j).front());
-        }
-    }
-    return compiledDurations;
 }
 
 /**
@@ -271,8 +236,9 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
  * @param filename      File to read data from
  * @return Vector of durations in microseconds, ordered list, vector, set
  */
-vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename) {
-    vector<vector<microseconds>> durations(3);
+vector<microseconds> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename) {
+
+    vector<microseconds> durations(3);
     
     //Verify file opens properly
     ifstream infile;
@@ -284,21 +250,20 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
 
     //Time read operation for the list
     //Use a dummy list for repeat tests
-    durations.at(0).push_back(Read(testList, infile)); 
+    durations.at(LIST) = Read(testList, infile); 
+
     //Reset file stream to beginning
     infile.clear();
     infile.seekg(0);
 
-
     //Time read operation for vector
-    durations.at(1).push_back(Read(testVector, infile));
+    durations.at(VECTOR) = Read(testVector, infile);
+
     infile.clear();
     infile.seekg(0);
     
     //Time read operation for set
-    durations.at(2).push_back(Read(testSet, infile));
-    infile.clear();
-    infile.seekg(0);
+    durations.at(SET) = Read(testSet, infile);
 
     infile.close();
 
@@ -369,7 +334,7 @@ microseconds Read(vector<string>& vector, ifstream& input) {
  * Time sort function of a list
  * @param l     List to sort
  * @param tests Number of times to repeat test
- * @return Durations in microseconds
+ * @return Duration in microseconds
  */
 vector<microseconds> TimeSort(list<string>& l, int tests) {
     //vector stores results of each test
