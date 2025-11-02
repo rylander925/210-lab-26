@@ -44,7 +44,7 @@ vector<microseconds> SortRace(list<string>& list, vector<string>& vect);
 vector<microseconds> InsertRace(list<string>&list, vector<string>& vect, set<string>& set, string value);
 vector<microseconds> DeleteRace(list<string>&list, vector<string>& vect, set<string>& set);
 
-void OutputRace(vector<microseconds> durations, string raceName, int spacing = DEFAULT_SPACING);
+void OutputRace(vector<vector<microseconds>> race, string raceName, int spacing = DEFAULT_SPACING);
 void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
 int main() {
@@ -102,43 +102,13 @@ int main() {
         }
     }
 
+    vector<string> raceNames = {"Read", "Sort", "Insert", "Delete"};
+
     //Outputs a header column (uses output function that takes array rows as input)
     OutputRace({"Operation", "List", "Vector", "Set"});
 
     for (int raceType = 0; raceType < races.size(); raceType++) {
-        switch (raceType) {
-            case 0:
-                cout << setw(SPACING) <<  left << "Read:";
-                break; 
-            case 1:
-                cout << setw(SPACING) <<  left << "Sort:";
-                break;
-            case 2:
-                cout << setw(SPACING) <<  left << "Insert:";
-                break;
-            case 3:
-                cout << setw(SPACING) <<  left << "Delete:";
-                break;
-        }
-        for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
-            //average out durations for each test
-            long long averageDuration = 0;
-            for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
-                long long duration = races.at(raceType).at(datatype).at(i).count();
-                averageDuration += duration;
-            }
-
-            //if the duration is negative, it has been set to a fixed value, so set to -1
-            if (averageDuration < 0) {
-                averageDuration = -1;
-            } else {
-                //otherwise calculate average as normal
-                //note integer division; since durations are generally long, will not matter much
-                averageDuration /= races.at(raceType).at(datatype).size();
-            }
-            cout << setw(SPACING) << left << averageDuration;
-        }
-        cout << endl;
+        OutputRace(races.at(raceType), raceNames.at(raceType));
     }
         
 
@@ -166,18 +136,33 @@ void OutputRace(vector<string> names, int spacing) {
 }
 
 /**
- * Outputs race durations as a table row: name followed by durations separated by spaces
- * @param durations List of durations, ordered list, vector, set
+ * Averages race durations and outputs as a table row: name followed by durations separated by spaces
+ * @param race      2D list of durations for list, vector, and set
  * @param raceName  Name to be displayed to the left of the durations
  * @param spacing   Spacing between table columns 
  */
-void OutputRace(vector<microseconds> durations, string raceName, int spacing) {
+void OutputRace(vector<vector<microseconds>> race, string raceName, int spacing) {
     //output race name
     cout << left << setw(spacing) << raceName;
 
     //followed by entries
-    for (microseconds duration : durations) {
-        cout << left << setw(spacing) << duration.count();
+    for (vector<microseconds> durations : race) {
+        //calculate the average duration of the race
+        long long averageDuration;
+        for (microseconds duration : durations) {
+            averageDuration += duration.count();
+        }
+        //if the duration is negative, it has been set to a fixed value, so set to -1
+        if (averageDuration < 0) {
+            averageDuration = -1;
+        } else {
+            //otherwise calculate average as normal
+            //note integer division; since durations are generally long, will not matter much
+            averageDuration /= durations.size();
+        }
+
+        //output result
+        cout << left << setw(spacing) << averageDuration;
     }
     cout << endl;
 }
