@@ -232,24 +232,24 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
         list<string> dummyList;
         vector<string> dummyVect;
         set<string> dummySet;
-        
-        //Time read operation for the list
-        //Use a dummy list for repeat tests
-        durations.at(0).push_back(Read((i == 0 ? testList : dummyList), infile)); 
 
         //Reset file stream to beginning
         infile.clear();
         infile.seekg(0);
+        //Time read operation for the list
+        //Use a dummy list for repeat tests
+        durations.at(0).push_back(Read((i == 0 ? testList : dummyList), infile)); 
 
+
+        infile.clear();
+        infile.seekg(0);
         //Time read operation for vector
         durations.at(1).push_back(Read((i == 0) ? testVector : dummyVect, infile));
+        
         infile.clear();
         infile.seekg(0);
-        
         //Time read operation for set
         durations.at(2).push_back(Read((i == 0) ? testSet : dummySet, infile));
-        infile.clear();
-        infile.seekg(0);
 
     }
     infile.close();
