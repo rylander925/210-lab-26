@@ -276,7 +276,7 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
 }
 
 /**
- * Run race for read operations on given list, vector, and set
+ * Run race for read operations on given list, vector, and set by first reading file contests into a list.
  * Returns vector of durations, ordered [0] list, [1] vector, [2] set
  * @param testList      List to read to
  * @param testSet       Set to read to
@@ -285,7 +285,8 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
  * @param tests         Number of times to repeat tests
  * @return Vector of durations in microseconds, ordered list, vector, set
  */
-vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename) {
+vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename, int tests) {
+    enum DATATYPE {LIST, VECTOR, SET};
     vector<vector<microseconds>> durations(3);
 
     list<string> fileContents;
@@ -304,7 +305,32 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
     }
     infile.close();
 
-    
+    for (int i = 0; i < tests; i++) {
+        list<string> dummyList;
+        vector<string> dummyVector;
+        set<string> dummySet;
+
+        auto start = high_resolution_clock::now();
+        for (string s : fileContents) {
+            (i == 0 ? testList : dummyList).push_back(s);
+        }
+        auto end = high_resolution_clock::now();
+        durations.at(LIST).push_back(duration_cast<microseconds>(end-start));
+
+        auto start = high_resolution_clock::now();
+        for (string s : fileContents) {
+            (i == 0 ? testVector : dummyVector).push_back(s);
+        }
+        auto end = high_resolution_clock::now();
+        durations.at(VECTOR).push_back(duration_cast<microseconds>(end-start));
+
+        auto start = high_resolution_clock::now();
+        for (string s : fileContents) {
+            (i == 0 ? testSet : dummySet).insert(s);
+        }
+        auto end = high_resolution_clock::now();
+        durations.at(SET).push_back(duration_cast<microseconds>(end-start));
+    }
 
     return durations;
 }
