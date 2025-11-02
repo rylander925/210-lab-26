@@ -46,21 +46,37 @@ void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
 int main() {
     const string FILENAME = "codes.txt";
-    const int READ_TESTS = 1;
-    const int SORT_TESTS = 1;
-    const int INSERTION_TESTS = 1;
+    const int READ_TESTS = 2;
+    const int SORT_TESTS = 2;
+    const int INSERTION_TESTS = 2;
     const int DELETION_TESTS = 1;
 
     list<string> list;
     set<string> set;
     vector<string> vect;
+
+    /*
+        3D array of stored times:
+            Outer vector stores results of each race, ordered from 0-3:
+                Read, Sort, Insert, Delete
+            Next inner vector stores results for each data type, ordered from 0-2:
+                list, vector, set
+            Final inner layer stores each time
+                 
+     */
+    vector<vector<vector<microseconds>>> races(4);
     
-    //Runs races and outputs as a table
-    OutputRace(vector<string>{"Operation", "List", "Vector", "Set"});
-    OutputRace(ReadRace(list, vect, set, FILENAME, READ_TESTS), "Read");
-    OutputRace(SortRace(list, vect, SORT_TESTS), "Sort");
-    OutputRace(InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS), "Insert");
-    OutputRace(DeleteRace(list, vect, set, DELETION_TESTS), "Delete");
+    //Runs races and store in 3D array
+    races.at(0) = ReadRace(list, vect, set, FILENAME, READ_TESTS);
+    races.at(1) = SortRace(list, vect, SORT_TESTS);
+    races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
+    races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
+
+    for (int raceType = 0; raceType < races.size(); raceType++) {
+        switch (raceType) {
+            
+        }
+    }
 
     return 0;
 }
@@ -150,7 +166,7 @@ vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, 
         {
             TimeSort(list, tests), 
             TimeSort(vect, tests), 
-            static_cast<microseconds>(-1)
+            vector<microseconds>(tests, static_cast<microseconds>(-1)) //initialize a dummy vector and set all times to -1
         };
 }
 
