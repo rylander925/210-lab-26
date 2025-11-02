@@ -72,30 +72,30 @@ int main() {
     vector<vector<vector<microseconds>>> races(4, vector<vector<microseconds>>(3));
 
     //2D array to store the results of each race
-    vector<vector<microseconds>> race(3);
+    vector<microseconds> race(3);
     for (int i = 0; i < TESTS; i++) {
         //Runs races and store in 3D array
         race = ReadRace(list, vect, set, FILENAME);
         for (int dataType = 0; dataType < race.size(); dataType++) {
-            races.at(READ).at(dataType).push_back(race.at(dataType).back());
+            races.at(READ).at(dataType).push_back(race.at(dataType));
         }
         for (auto durations : races.at(READ)) {
             cout << "Durations: " << durations.front().count() << endl;
         }
 
-        race = SortRace(list, vect, 1);
+        race = SortRace(list, vect);
         for (int dataType = 0; dataType < race.size(); dataType++) {
-            races.at(SORT).at(dataType).push_back(race.at(dataType).front());
+            races.at(SORT).at(dataType).push_back(race.at(dataType));
         }
         
-        race = InsertRace(list, vect, set, "TESTCODE", 1);
+        race = InsertRace(list, vect, set, "TESTCODE");
         for (int dataType = 0; dataType < race.size(); dataType++) {
-            races.at(INSERT).at(dataType).push_back(race.at(dataType).front());
+            races.at(INSERT).at(dataType).push_back(race.at(dataType));
         }
 
-        race = DeleteRace(list, vect, set, 1);
+        race = DeleteRace(list, vect, set);
         for (int dataType = 0; dataType < race.size(); dataType++) {
-            races.at(DELETE).at(dataType).push_back(race.at(dataType).front());
+            races.at(DELETE).at(dataType).push_back(race.at(dataType));
         }
     }
 
@@ -333,87 +333,42 @@ microseconds Read(vector<string>& vector, ifstream& input) {
 /**
  * Time sort function of a list
  * @param l     List to sort
- * @param tests Number of times to repeat test
  * @return Duration in microseconds
  */
-vector<microseconds> TimeSort(list<string>& l, int tests) {
-    //vector stores results of each test
-    vector<microseconds> durations;
-
-    //sort using a dummy variable for all but last test
-    for (int i = 0; i < tests - 1; i++) {
-        //create a dummy list for multiple tests
-        list<string> testList = l;
-
-        auto start = high_resolution_clock::now();
-        testList.sort();
-        auto end = high_resolution_clock::now();
-
-        durations.push_back(duration_cast<microseconds>(end - start));
-    }
-
-    //sort using actual list for final test
+microseconds TimeSort(list<string>& l) {
     auto start = high_resolution_clock::now();
     l.sort();
     auto end = high_resolution_clock::now();
-    durations.push_back(duration_cast<microseconds>(end - start));
 
-    return durations;
+    return duration_cast<microseconds>(end - start);
 }
 
 /**
  * Time sort function of a vector
  * @param vector Vector to sort
- * @param tests  Number of times to repeat test
- * @return Durations in microseconds
+ * @return Duration in microseconds
  */
-vector<microseconds> TimeSort(vector<string>& vect, int tests) {
-    //vector stores results of each test
-    vector<microseconds> durations;
-
-    //test with a dummy vector for all but last test
-    for (int i = 0; i < tests - 1; i++) {
-        //initialize a dummy vector
-        vector<string> testVect = vect;
-
-        //time sort operation for dummy tests
-        auto start = high_resolution_clock::now();
-        sort(testVect.begin(), testVect.end());
-        auto end = high_resolution_clock::now();
-
-        durations.push_back(duration_cast<microseconds>(end - start));
-    }
-
-    //sort the actual vector for the final test
+microseconds TimeSort(vector<string>& vect) {
     auto start = high_resolution_clock::now();
     sort(vect.begin(), vect.end());
     auto end = high_resolution_clock::now();
 
-    durations.push_back(duration_cast<microseconds>(end - start));
-
-    return durations;
+    return duration_cast<microseconds>(end - start);
 }
 
 /**
  * Time how long it takes to add a value to a set
  * @param set   Set to insert a value to
  * @param value Value to insert into set
- * @param tests Number of times to repeat test
  * @return Durations in microseconds
  */
-vector<microseconds> TimeInsert(set<string>& set, string value, int tests) {
-    //vector to store durations
-    vector<microseconds> durations;
-    
-    for(int i = 0; i < tests; i++) {
-        //start timer and insert
-        auto start = high_resolution_clock::now();
-        set.insert(value);
-        auto end = high_resolution_clock::now();
-        durations.push_back(duration_cast<microseconds>(end - start));
-    }
+microseconds TimeInsert(set<string>& set, string value) {
+    //start timer and insert
+    auto start = high_resolution_clock::now();
+    set.insert(value);
+    auto end = high_resolution_clock::now();
 
-    return durations;
+    return duration_cast<microseconds>(end - start);
 }
 
 /**
@@ -421,22 +376,15 @@ vector<microseconds> TimeInsert(set<string>& set, string value, int tests) {
  * @param vect   Vector to insert value to
  * @param index  Index to insert value to
  * @param value  Value to insert
- * @param tests  Number of times to repeat test
- * @return Durations in microseconds
+ * @return Duration in microseconds
  */
-vector<microseconds> TimeInsert(vector<string>& vect, int index, string value, int tests) {
-    //Use a vector to store durations of each test
-    vector<microseconds> durations;
+microseconds TimeInsert(vector<string>& vect, int index, string value) {
+    //time insert operation
+    auto start = high_resolution_clock::now();
+    vect.insert(vect.begin() + index, value);
+    auto end = high_resolution_clock::now();
 
-    for(int i = 0; i < tests; i++) {
-        //time insert operations based on # of tests
-        auto start = high_resolution_clock::now();
-        vect.insert(vect.begin() + index, value);
-        auto end = high_resolution_clock::now();
-        durations.push_back(duration_cast<microseconds>(end - start));
-    }
-
-    return durations;
+    return duration_cast<microseconds>(end - start);
 }
 
 /**
@@ -445,76 +393,55 @@ vector<microseconds> TimeInsert(vector<string>& vect, int index, string value, i
  * @param l     List to insert value to
  * @param index Index to insert value to
  * @param value Value to insert
- * @param tests Number of times to repeat test
- * @return Durations in microseconds
+ * @return Duration in microseconds
  */
-vector<microseconds> TimeInsert(list<string>& l, int index, string value, int tests) {
+microseconds TimeInsert(list<string>& l, int index, string value) {
     //iterate through list to the specified location before starting timer
     list<string>::iterator location = l.begin();
     for (int i = 0; i < index; i++) 
         location++;
 
-    //Use a vector to store durations of each test
-    vector<microseconds> durations;
-    
-    for (int i = 0; i < tests; i++) {
-        //start timer and time insert operations based on number of tests
-        auto start = high_resolution_clock::now();
-        l.insert(location, value);
-        auto end = high_resolution_clock::now();
-        durations.push_back(duration_cast<microseconds>(end - start));
-    }
-    return durations;
+    //start timer and time insert operations based on number of tests
+    auto start = high_resolution_clock::now();
+    l.insert(location, value);
+    auto end = high_resolution_clock::now();
+
+    return duration_cast<microseconds>(end - start);
 }
 
 /**
  * Time how long it takes to delete a value from a set
  * @param testSet Set to delete a value from
  * @param index   Index to delete
- * @param tests   Number of times to repeat test
- * @return Durations in microseconds
+ * @return Duration in microseconds
  * @note Does not check for an empty set
  */
-vector<microseconds> TimeDelete(set<string>& testSet, int index, int tests) {
-    
-    //Use a vector to store durations
-    vector<microseconds> durations;
-    
-    
-    for(int i = 0; i < tests; i++) {
-        //iterate through set to the specified location before starting timer
-        set<string>::iterator location = testSet.begin();
-        for (int i = 0; i < index; i++) location++;
+microseconds TimeDelete(set<string>& testSet, int index) {
+    //iterate through set to the specified location before starting timer
+    set<string>::iterator location = testSet.begin();
+    for (int i = 0; i < index; i++) location++;
 
-        //start timer and time delete operations based on number of tests
-        auto start = high_resolution_clock::now();
-        testSet.erase(location);
-        auto end = high_resolution_clock::now();
-        durations.push_back(duration_cast<microseconds>(end - start));
-    }
-    return durations;
+    //start timer and time delete operations based on number of tests
+    auto start = high_resolution_clock::now();
+    testSet.erase(location);
+    auto end = high_resolution_clock::now();
+
+    return duration_cast<microseconds>(end - start);
 }
 
 /**
  * Time how long it takes to delete a value at the specified index
  * @param vect   Vector to delete a value from
  * @param index  Index to delete a value from
- * @param tests  Number of times to repeat test
- * @return Durations in microseconds
+ * @return Duration in microseconds
  * @note Does not check whether vector is empty
  */
-vector<microseconds> TimeDelete(vector<string>& vect, int index, int tests) {
-    //Use vector to store durations
-    vector<microseconds> durations;
-
-    for(int i = 0; i < tests; i++) {
-        //start timer and time delete operations based on number of tests
-        auto start = high_resolution_clock::now();
-        vect.erase(vect.begin() + index);
-        auto end = high_resolution_clock::now();
-        durations.push_back(duration_cast<microseconds>(end - start));
-    }
-    return durations;
+microseconds TimeDelete(vector<string>& vect, int index) {
+    //start timer and time delete operations based on number of tests
+    auto start = high_resolution_clock::now();
+    vect.erase(vect.begin() + index);
+    auto end = high_resolution_clock::now();
+    return duration_cast<microseconds>(end - start);
 }
 
 /**
@@ -522,25 +449,18 @@ vector<microseconds> TimeDelete(vector<string>& vect, int index, int tests) {
  * Does not track the time needed to iterate through the list to retrieve the iterator at the proper position.
  * @param l     List to delete value of
  * @param index Index to delete
- * @param tests Number of times to repeat test
  * @return Durations in microseconds
  * @note Does not check whether list is empty
  */
-vector<microseconds> TimeDelete(list<string>& l, int index, int tests) {
-    
-    //Use a vector to store durations
-    vector<microseconds> durations;
-    
-    for (int i = 0; i < tests; i++) {
-        //iterate through list to the specified location; does not start timer
-        list<string>::iterator location = l.begin();
-        for (int i = 0; i < index; i++) location++;
+microseconds TimeDelete(list<string>& l, int index) {
+    //iterate through list to the specified location; does not start timer
+    list<string>::iterator location = l.begin();
+    for (int i = 0; i < index; i++) location++;
 
-        //starts timer and times delete operations
-        auto start = high_resolution_clock::now();
-        l.erase(location);
-        auto end = high_resolution_clock::now();
-        durations.push_back(duration_cast<microseconds>(end - start));
-    }
-    return durations;
+    //starts timer and times delete operations
+    auto start = high_resolution_clock::now();
+    l.erase(location);
+    auto end = high_resolution_clock::now();
+
+    return duration_cast<microseconds>(end - start);
 }
