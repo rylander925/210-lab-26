@@ -50,29 +50,20 @@ void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 int main() {
     const string FILENAME = "codes.txt";
     const int TESTS = 15;
-    const int READ_TESTS = 1;
-    const int SORT_TESTS = 1;
-    const int INSERTION_TESTS = 1;
-    const int DELETION_TESTS = 1;
-    const int SPACING = 15;
-
-    list<string> list;
-    set<string> set;
-    vector<string> vect;
-
-    /*
-        3D array of stored times:
+    /* 3D array of stored times:
             Outer vector stores results of each race, ordered from 0-3:
                 Read, Sort, Insert, Delete
             Next inner vector stores results for each data type, ordered from 0-2:
                 list, vector, set
-            Final inner layer stores each time
-                 
-     */
+            Final inner layer stores each time */
     vector<vector<vector<microseconds>>> races(4, vector<vector<microseconds>>(3));
 
     //2D array to store the results of each race
     vector<microseconds> race(3);
+    
+    list<string> list;
+    set<string> set;
+    vector<string> vect;
 
     //Run each test race multiple times and save results to 3D array
     //Yielded more consistent times than looping within each race function
@@ -82,45 +73,34 @@ int main() {
         for (int dataType = 0; dataType < race.size(); dataType++) {
             races.at(READ).at(dataType).push_back(race.at(dataType));
         }
-        for (auto durations : races.at(READ)) {
-            cout << "Durations: " << durations.front().count() << endl;
-        }
-
-        race = SortRace(list, vect);
-        for (int dataType = 0; dataType < race.size(); dataType++) {
-            races.at(SORT).at(dataType).push_back(race.at(dataType));
-        }
         
         race = InsertRace(list, vect, set, "TESTCODE");
         for (int dataType = 0; dataType < race.size(); dataType++) {
             races.at(INSERT).at(dataType).push_back(race.at(dataType));
         }
-
         race = DeleteRace(list, vect, set);
         for (int dataType = 0; dataType < race.size(); dataType++) {
             races.at(DELETE).at(dataType).push_back(race.at(dataType));
         }
+        
+        race = SortRace(list, vect);
+        for (int dataType = 0; dataType < race.size(); dataType++) {
+            races.at(SORT).at(dataType).push_back(race.at(dataType));
+        }
+        
     }
 
     vector<string> raceNames = {"Read", "Sort", "Insert", "Delete"};
 
-    //Outputs a header column (uses output function that takes array rows as input)
+    //Outputs table contents
+    cout << "Number of simulations: " << TESTS << endl;
     OutputRace({"Operation", "List", "Vector", "Set"});
-
     for (int raceType = 0; raceType < races.size(); raceType++) {
         OutputRace(races.at(raceType), raceNames.at(raceType));
     }
         
-
     return 0;
 }
-
-/* syntax examples:
-auto start = high_resolution_clock::now()
-auto end = high_resolution_clock::now()
-auto duration = duration_cast<microseconds>(end - start)
-duration.count() references elapsed microseconds
-*/
 
 /**
  * Outputs race names as a header table row
@@ -148,7 +128,7 @@ void OutputRace(vector<vector<microseconds>> race, string raceName, int spacing)
     //followed by entries
     for (vector<microseconds> durations : race) {
         //calculate the average duration of the race
-        long long averageDuration;
+        long long averageDuration = 0;
         for (microseconds duration : durations) {
             averageDuration += duration.count();
         }
@@ -267,16 +247,12 @@ vector<microseconds> ReadRace(list<string>& testList, vector<string>& testVector
  */
 microseconds Read(list<string>& list, ifstream& input) {
     auto start = high_resolution_clock::now();
-
     //Read all data from input stream and add to list
     string value;
     while (getline(input, value)) {
         list.push_back(value);
     }
-
     auto end = high_resolution_clock::now();
-
-    cout << "Read list: " << duration_cast<microseconds>(end - start).count() << endl;
 
     return duration_cast<microseconds>(end - start);
 }
