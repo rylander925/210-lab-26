@@ -36,6 +36,7 @@ vector<microseconds> TimeDelete(set<string>& set, int index, int tests);
 vector<microseconds> TimeDelete(list<string>& list, int index, int tests);
 
 //modify to 2d array to store multiple times
+vector<vector<microseconds>> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename);
 vector<vector<microseconds>> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename, int tests);
 vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, int tests);
 vector<vector<microseconds>> InsertRace(list<string>&list, vector<string>& vect, set<string>& set, string value, int tests);
@@ -238,10 +239,9 @@ vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, 
  * @param testSet       Set to read to
  * @param testVector    Vector to read to
  * @param filename      File to read data from
- * @param tests         Number of times to repeat tests
  * @return Vector of durations in microseconds, ordered list, vector, set
  */
-vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename, int tests) {
+vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename) {
     vector<vector<microseconds>> durations(3);
     
     //Verify file opens properly
@@ -251,31 +251,60 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
         cout << "Error opening file " << filename << endl;
         throw ios_base::failure("File open error");
     }
+
+    //Time read operation for the list
+    //Use a dummy list for repeat tests
+    durations.at(0).push_back(Read(testList, infile)); 
+    //Reset file stream to beginning
+    infile.clear();
+    infile.seekg(0);
+
+
+    //Time read operation for vector
+    durations.at(1).push_back(Read(testVector, infile));
+    infile.clear();
+    infile.seekg(0);
     
-    for (int i = 0; i < tests; i++) {
-        list<string> dummyList;
-        vector<string> dummyVect;
-        set<string> dummySet;
+    //Time read operation for set
+    durations.at(2).push_back(Read(testSet, infile));
+    infile.clear();
+    infile.seekg(0);
 
-        //Time read operation for the list
-        //Use a dummy list for repeat tests
-        durations.at(0).push_back(Read((i == 0 ? testList : dummyList), infile)); 
-        //Reset file stream to beginning
-        infile.clear();
-        infile.seekg(0);
+    infile.close();
 
+    return durations;
+}
 
-        //Time read operation for vector
-        durations.at(1).push_back(Read((i == 0) ? testVector : dummyVect, infile));
-        infile.clear();
-        infile.seekg(0);
-        
-        //Time read operation for set
-        durations.at(2).push_back(Read((i == 0) ? testSet : dummySet, infile));
-        infile.clear();
-        infile.seekg(0);
+/**
+ * Run race for read operations on given list, vector, and set
+ * Returns vector of durations, ordered [0] list, [1] vector, [2] set
+ * @param testList      List to read to
+ * @param testSet       Set to read to
+ * @param testVector    Vector to read to
+ * @param filename      File to read data from
+ * @param tests         Number of times to repeat tests
+ * @return Vector of durations in microseconds, ordered list, vector, set
+ */
+vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename) {
+    vector<vector<microseconds>> durations(3);
+
+    list<string> fileContents;
+    string line;
+    
+    //Verify file opens properly
+    ifstream infile;
+    infile.open(filename);
+    if (!infile.is_open()) {
+        cout << "Error opening file " << filename << endl;
+        throw ios_base::failure("File open error");
+    }
+
+    while(getline(infile, line)) {
+        fileContents.push_back(line);
     }
     infile.close();
+
+    
 
     return durations;
 }
