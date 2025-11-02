@@ -42,41 +42,13 @@ vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, 
 vector<vector<microseconds>> InsertRace(list<string>&list, vector<string>& vect, set<string>& set, string value, int tests);
 vector<vector<microseconds>> DeleteRace(list<string>&list, vector<string>& vect, set<string>& set, int tests);
 
-/**
- * Returns resulting durations from sorting race between a list and vector. Third duration (for a set) is -1.
- * @param list  List to sort
- * @param vect  Vector to sort
- * @param tests Number of times to repeat test
- * @return Vector of sorting durations, ordered list, vector, set
- */
-vector<vector<microseconds>> TestSortRace(list<string>& testList, vector<string>& testVector, int tests) {
-    enum DATATYPES {LIST, VECTOR, SET};
-    vector<vector<microseconds>> compiledDurations(3);
-
-    //Run timers and add to vector of compiled durations. The third parameter is set to -1 for a set
-    for (int i = 0; i < tests; i++) {
-        if (i == (tests - 1)) { //run on parameter lists for the last test
-            compiledDurations.at(LIST).push_back(TimeSort(testList, 1).front());
-            compiledDurations.at(VECTOR).push_back(TimeSort(testVector, 1).front());
-        } else {                //copy unsorted lists and run on dummy lists for other tests
-            list<string> dummyList = testList;
-            vector<string> dummyVector = testVector;
-            compiledDurations.at(LIST).push_back(TimeSort(dummyList, 1).front());
-            compiledDurations.at(VECTOR).push_back(TimeSort(dummyVector, 1).front());
-        }
-        compiledDurations.at(SET).push_back(microseconds(-1));
-    }
-    
-    return compiledDurations;
-}
-
 void OutputRace(vector<microseconds> durations, string raceName, int spacing = DEFAULT_SPACING);
 void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
 int main() {
     const string FILENAME = "codes.txt";
-    const int TESTS = 5;
-    const int READ_TESTS = 15;
+    const int TESTS = 15;
+    const int READ_TESTS = 1;
     const int SORT_TESTS = 1;
     const int INSERTION_TESTS = 1;
     const int DELETION_TESTS = 1;
@@ -97,15 +69,37 @@ int main() {
      */
 
     
-    vector<vector<vector<microseconds>>> races(4);
+    vector<vector<vector<microseconds>>> races(4, vector<vector<microseconds>>(3));
+    vector<vector<microseconds>> race(3);
+    enum RACETYPE {READ, SORT, INSERT, DELETE};
+    enum DATATYPE {LIST, VECTOR, SET};
     for (int i = 0; i < TESTS; i++) {
         //Runs races and store in 3D array
-        races.at(0) = ReadRace(list, vect, set, FILENAME, READ_TESTS);
-        races.at(1) = SortRace(list, vect, SORT_TESTS);
-        //races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
-        //races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
+        race = ReadRace(list, vect, set, FILENAME);
+        for (int dataType = 0; dataType < race.size(); dataType++) {
+            races.at(READ).at(dataType).push_back(race.at(dataType).back());
+        }
+        for (auto durations : races.at(READ)) {
+            cout << "Durations: " << durations.front().count() << endl;
+        }
 
-        OutputRace({"Operation", "List", "Vector", "Set"});
+        race = SortRace(list, vect, 1);
+        for (int dataType = 0; dataType < race.size(); dataType++) {
+            races.at(SORT).at(dataType).push_back(race.at(dataType).front());
+        }
+        
+        race = InsertRace(list, vect, set, "TESTCODE", 1);
+        for (int dataType = 0; dataType < race.size(); dataType++) {
+            races.at(INSERT).at(dataType).push_back(race.at(dataType).front());
+        }
+
+        race = DeleteRace(list, vect, set, 1);
+        for (int dataType = 0; dataType < race.size(); dataType++) {
+            races.at(DELETE).at(dataType).push_back(race.at(dataType).front());
+        }
+    }
+
+    OutputRace({"Operation", "List", "Vector", "Set"});
 
         for (int raceType = 0; raceType < races.size(); raceType++) {
             switch (raceType) {
@@ -145,7 +139,6 @@ int main() {
             }
             cout << endl;
         }
-    }
         
 
     return 0;
