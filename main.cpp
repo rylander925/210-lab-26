@@ -88,9 +88,9 @@ int main() {
 
     
     vector<vector<vector<microseconds>>> races(4);
-    for (int i = 0; i < TESTS; i++) {
+    for (int i = 0; i < 1; i++) {
         //Runs races and store in 3D array
-        races.at(0) = TestReadRace(list, vect, set, FILENAME, READ_TESTS);
+        races.at(0) = ReadRace(list, vect, set, FILENAME, 10);
 
         //races.at(0) = ReadRace(list, vect, set, FILENAME, READ_TESTS);
         //races.at(1) = SortRace(list, vect, SORT_TESTS);
@@ -271,66 +271,6 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
     infile.seekg(0);
 
     infile.close();
-
-    return durations;
-}
-
-/**
- * Run race for read operations on given list, vector, and set by first reading file contests into a list.
- * Returns vector of durations, ordered [0] list, [1] vector, [2] set
- * @param testList      List to read to
- * @param testSet       Set to read to
- * @param testVector    Vector to read to
- * @param filename      File to read data from
- * @param tests         Number of times to repeat tests
- * @return Vector of durations in microseconds, ordered list, vector, set
- */
-vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename, int tests) {
-    enum DATATYPE {LIST, VECTOR, SET};
-    vector<vector<microseconds>> durations(3);
-
-    list<string> fileContents;
-    string line;
-    
-    //Verify file opens properly
-    ifstream infile;
-    infile.open(filename);
-    if (!infile.is_open()) {
-        cout << "Error opening file " << filename << endl;
-        throw ios_base::failure("File open error");
-    }
-
-    while(getline(infile, line)) {
-        fileContents.push_back(line);
-    }
-    infile.close();
-
-    for (int i = 0; i < tests; i++) {
-        list<string> dummyList;
-        vector<string> dummyVector;
-        set<string> dummySet;
-
-        auto start = high_resolution_clock::now();
-        for (string s : fileContents) {
-            (i == 0 ? testList : dummyList).push_back(s);
-        }
-        auto end = high_resolution_clock::now();
-        durations.at(LIST).push_back(duration_cast<microseconds>(end-start));
-
-        auto start = high_resolution_clock::now();
-        for (string s : fileContents) {
-            (i == 0 ? testVector : dummyVector).push_back(s);
-        }
-        auto end = high_resolution_clock::now();
-        durations.at(VECTOR).push_back(duration_cast<microseconds>(end-start));
-
-        auto start = high_resolution_clock::now();
-        for (string s : fileContents) {
-            (i == 0 ? testSet : dummySet).insert(s);
-        }
-        auto end = high_resolution_clock::now();
-        durations.at(SET).push_back(duration_cast<microseconds>(end-start));
-    }
 
     return durations;
 }
