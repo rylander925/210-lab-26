@@ -219,10 +219,7 @@ vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, 
  */
 vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename, int tests) {
     vector<vector<microseconds>> durations(3);
-    list<string> dummyList;
-    vector<string> dummyVect;
-    set<string> dummySet;
-
+    
     //Verify file opens properly
     ifstream infile;
     infile.open(filename);
@@ -230,8 +227,12 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
         cout << "Error opening file " << filename << endl;
         throw ios_base::failure("File open error");
     }
-
+    
     for (int i = 0; i < tests; i++) {
+        list<string> dummyList;
+        vector<string> dummyVect;
+        set<string> dummySet;
+        
         //Time read operation for the list
         //Use a dummy list for repeat tests
         durations.at(0).push_back(Read((i == 0 ? testList : dummyList), infile)); 
@@ -250,10 +251,6 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
         infile.clear();
         infile.seekg(0);
 
-        //clear dummys for repeated tests
-        dummyList.clear();
-        dummyVect.clear();
-        dummySet.clear();
     }
     infile.close();
 
