@@ -46,7 +46,7 @@ void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
 int main() {
     const string FILENAME = "codes.txt";
-    const int TESTS = 1;
+    const int TESTS = 10;
     const int READ_TESTS = TESTS;
     const int SORT_TESTS = TESTS;
     const int INSERTION_TESTS = TESTS;
@@ -94,9 +94,13 @@ int main() {
         for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
             //average out durations for each test
             long long averageDuration = 0;
+            cout << "{";
             for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
-                averageDuration += races.at(raceType).at(datatype).at(i).count();
+                long long duration = races.at(raceType).at(datatype).at(i).count();
+                cout << duration << ", ";
+                averageDuration += duration;
             }
+            cout << "}";
 
             //if the duration is negative, it has been set to a fixed value, so set to -1
             if (averageDuration < 0) {
@@ -272,6 +276,9 @@ microseconds Read(list<string>& list, ifstream& input) {
     }
 
     auto end = high_resolution_clock::now();
+
+    cout << "Read list: " << duration_cast<microseconds>(end - start).count() << endl;
+
     return duration_cast<microseconds>(end - start);
 }
 

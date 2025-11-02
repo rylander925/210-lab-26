@@ -2,6 +2,14 @@
     "files.associations": {
         "xstring": "cpp",
         "set": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "chrono": "cpp",
+        "format": "cpp",
+        "forward_list": "cpp",
+        "initializer_list": "cpp",
+        "list": "cpp",
+        "xiosbase": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp"
     }
 }
