@@ -49,7 +49,7 @@ int main() {
     const int READ_TESTS = 2;
     const int SORT_TESTS = 2;
     const int INSERTION_TESTS = 2;
-    const int DELETION_TESTS = 1;
+    const int DELETION_TESTS = 2;
 
     list<string> list;
     set<string> set;
@@ -74,7 +74,34 @@ int main() {
 
     for (int raceType = 0; raceType < races.size(); raceType++) {
         switch (raceType) {
-            
+            case 0:
+                cout << "Read:" << endl;
+                break; 
+            case 1:
+                cout << "Sort:" << endl;
+                break;
+            case 2:
+                cout << "Insert:" << endl;
+                break;
+            case 3:
+                cout << "Delete:" << endl;
+                break;
+        }
+        for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
+            switch (datatype) {
+                case 0:
+                    cout << "\tList:" << endl;
+                    break; 
+                case 1:
+                    cout << "\tVector:" << endl;
+                    break;
+                case 2:
+                    cout << "\tSet:" << endl;
+                    break;
+            }
+            for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
+                cout << "\t\t" << races.at(raceType).at(datatype).at(i).count() << endl;
+            }
         }
     }
 
@@ -306,7 +333,7 @@ vector<microseconds> TimeSort(list<string>& l, int tests) {
     auto start = high_resolution_clock::now();
     l.sort();
     auto end = high_resolution_clock::now();
-    totalTimes.push_back(duration_cast<microseconds>(end - start));
+    durations.push_back(duration_cast<microseconds>(end - start));
 
     return durations;
 }
@@ -386,7 +413,7 @@ vector<microseconds> TimeInsert(vector<string>& vect, int index, string value, i
         durations.push_back(duration_cast<microseconds>(end - start));
     }
 
-    return durations
+    return durations;
 }
 
 /**
@@ -426,16 +453,16 @@ vector<microseconds> TimeInsert(list<string>& l, int index, string value, int te
  * @note Does not check for an empty set
  */
 vector<microseconds> TimeDelete(set<string>& testSet, int index, int tests) {
-    //iterate through set to the specified location before starting timer
-    set<string>::iterator location = testSet.begin();
-    for (int i = 0; i < index; i++) 
-        location++;
-
+    
     //Use a vector to store durations
     vector<microseconds> durations;
-
+    
     
     for(int i = 0; i < tests; i++) {
+        //iterate through set to the specified location before starting timer
+        set<string>::iterator location = testSet.begin();
+        for (int i = 0; i < index; i++) location++;
+        
         //start timer and time delete operations based on number of tests
         auto start = high_resolution_clock::now();
         testSet.erase(location);
@@ -477,14 +504,14 @@ vector<microseconds> TimeDelete(vector<string>& vect, int index, int tests) {
  * @note Does not check whether list is empty
  */
 vector<microseconds> TimeDelete(list<string>& l, int index, int tests) {
-    //iterate through list to the specified location; does not start timer
-    list<string>::iterator location = l.begin();
-    for (int i = 0; i < index; i++) location++;
-
+    
     //Use a vector to store durations
     vector<microseconds> durations;
     
     for (int i = 0; i < tests; i++) {
+        //iterate through list to the specified location; does not start timer
+        list<string>::iterator location = l.begin();
+        for (int i = 0; i < index; i++) location++;
         //starts timer and times delete operations
         auto start = high_resolution_clock::now();
         l.erase(location);
