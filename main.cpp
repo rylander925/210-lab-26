@@ -21,21 +21,25 @@ microseconds Read(list<string>& list, ifstream& input);
 microseconds Read(set<string>& set, ifstream& input);
 microseconds Read(vector<string>& vect, ifstream& input);
 
-microseconds TimeSort(vector<string>& vector, int tests);
-microseconds TimeSort(list<string>& list, int tests);
+//modify to 2d array to store multiple times
+vector<microseconds> TimeSort(vector<string>& vector, int tests);
+vector<microseconds> TimeSort(list<string>& list, int tests);
 
-microseconds TimeInsert(vector<string>& vector, int index, string value, int tests);
-microseconds TimeInsert(set<string>& set, string value, int tests);
-microseconds TimeInsert(list<string>& list, int index, string value, int tests);
+//modify to 2d array to store multiple times
+vector<microseconds> TimeInsert(vector<string>& vector, int index, string value, int tests);
+vector<microseconds> TimeInsert(set<string>& set, string value, int tests);
+vector<microseconds> TimeInsert(list<string>& list, int index, string value, int tests);
 
-microseconds TimeDelete(vector<string>& vector, int index, int tests);
-microseconds TimeDelete(set<string>& set, int index, int tests);
-microseconds TimeDelete(list<string>& list, int index, int tests);
+//modify to 2d array to store multiple times
+vector<microseconds> TimeDelete(vector<string>& vector, int index, int tests);
+vector<microseconds> TimeDelete(set<string>& set, int index, int tests);
+vector<microseconds> TimeDelete(list<string>& list, int index, int tests);
 
-vector<microseconds> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename, int tests);
-vector<microseconds> SortRace(list<string>& list, vector<string>& vect, int tests);
-vector<microseconds> InsertRace(list<string>&list, vector<string>& vect, set<string>& set, string value, int tests);
-vector<microseconds> DeleteRace(list<string>&list, vector<string>& vect, set<string>& set, int tests);
+//modify to 2d array to store multiple times
+vector<vector<microseconds>> ReadRace(list<string>& list, vector<string>& vect, set<string>& set, string filename, int tests);
+vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, int tests);
+vector<vector<microseconds>> InsertRace(list<string>&list, vector<string>& vect, set<string>& set, string value, int tests);
+vector<vector<microseconds>> DeleteRace(list<string>&list, vector<string>& vect, set<string>& set, int tests);
 
 void OutputRace(vector<microseconds> durations, string raceName, int spacing = DEFAULT_SPACING);
 void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
@@ -106,9 +110,9 @@ void OutputRace(vector<microseconds> durations, string raceName, int spacing) {
  * @param tests    Number of times to repeat test
  * @return Vector containing durations of tests, ordered list, vector, set
  */
-vector<microseconds> DeleteRace(list<string>&testList, vector<string>& vect, set<string>& set, int tests) {
+vector<vector<microseconds>> DeleteRace(list<string>&testList, vector<string>& vect, set<string>& set, int tests) {
     //Run timers for each delete operation and return times as an array
-    return vector<microseconds>
+    return vector<vector<microseconds>>
         {   TimeDelete(testList, testList.size() / 2, tests),
             TimeDelete(vect, vect.size() / 2, tests),
             TimeDelete(set, set.size() / 2, tests)
@@ -124,9 +128,9 @@ vector<microseconds> DeleteRace(list<string>&testList, vector<string>& vect, set
  * @param tests    Number of times to repeat test
  * @return Vector containing durations of tests, ordered list, vector, set
  */
-vector<microseconds> InsertRace(list<string>&testList, vector<string>& vect, set<string>& set, string value, int tests) {
+vector<vector<microseconds>> InsertRace(list<string>&testList, vector<string>& vect, set<string>& set, string value, int tests) {
     //Run timers and return as an array
-    return vector<microseconds>
+    return vector<vector<microseconds>>
         {   TimeInsert(testList, testList.size() / 2, value, tests),
             TimeInsert(vect, vect.size() / 2, value, tests),
             TimeInsert(set, value, tests)
@@ -140,9 +144,9 @@ vector<microseconds> InsertRace(list<string>&testList, vector<string>& vect, set
  * @param tests Number of times to repeat test
  * @return Vector of sorting durations, ordered list, vector, set
  */
-vector<microseconds> SortRace(list<string>& list, vector<string>& vect, int tests) {
+vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, int tests) {
     //Run timers and return as an array. The third parameter is set to negative one for a set
-    return vector<microseconds>
+    return vector<vector<microseconds>>
         {
             TimeSort(list, tests), 
             TimeSort(vect, tests), 
@@ -160,8 +164,8 @@ vector<microseconds> SortRace(list<string>& list, vector<string>& vect, int test
  * @param tests         Number of times to repeat tests
  * @return Vector of durations in microseconds, ordered list, vector, set
  */
-vector<microseconds> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename, int tests) {
-    vector<microseconds> durations(3, microseconds(0));
+vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVector, set<string>& testSet, string filename, int tests) {
+    vector<vector<microseconds>> durations(3);
     list<string> dummyList;
     vector<string> dummyVect;
     set<string> dummySet;
@@ -177,19 +181,19 @@ vector<microseconds> ReadRace(list<string>& testList, vector<string>& testVector
     for (int i = 0; i < tests; i++) {
         //Time read operation for the list
         //Use a dummy list for repeat tests
-        durations.at(0) += Read((i == 0 ? testList : dummyList), infile); 
+        durations.at(0).push_back(Read((i == 0 ? testList : dummyList), infile)); 
 
         //Reset file stream to beginning
         infile.clear();
         infile.seekg(0);
 
         //Time read operation for vector
-        durations.at(1) += Read((i == 0) ? testVector : dummyVect, infile);
+        durations.at(1).push_back(Read((i == 0) ? testVector : dummyVect, infile));
         infile.clear();
         infile.seekg(0);
         
         //Time read operation for set
-        durations.at(2) += Read((i == 0) ? testSet : dummySet, infile);
+        durations.at(2).push_back(Read((i == 0) ? testSet : dummySet, infile));
         infile.clear();
         infile.seekg(0);
 
@@ -264,11 +268,11 @@ microseconds Read(vector<string>& vector, ifstream& input) {
  * Time sort function of a list
  * @param l     List to sort
  * @param tests Number of times to repeat test
- * @return Duration in microseconds
+ * @return Durations in microseconds
  */
-microseconds TimeSort(list<string>& l, int tests) {
-    //accumulator to sum durations of multiple tests
-    microseconds totalTime(0);
+vector<microseconds> TimeSort(list<string>& l, int tests) {
+    //vector stores results of each test
+    vector<microseconds> totalTimes;
 
     //sort using a dummy variable for all but last test
     for (int i = 0; i < tests - 1; i++) {
@@ -279,27 +283,27 @@ microseconds TimeSort(list<string>& l, int tests) {
         testList.sort();
         auto end = high_resolution_clock::now();
 
-        totalTime += duration_cast<microseconds>(end - start);
+        totalTimes.push_back(duration_cast<microseconds>(end - start));
     }
 
     //sort using actual list for final test
     auto start = high_resolution_clock::now();
     l.sort();
     auto end = high_resolution_clock::now();
-    totalTime += duration_cast<microseconds>(end - start);
+    totalTimes.push_back(duration_cast<microseconds>(end - start));
 
-    return totalTime;
+    return totalTimes;
 }
 
 /**
  * Time sort function of a vector
  * @param vector Vector to sort
  * @param tests  Number of times to repeat test
- * @return Duration in microseconds
+ * @return Durations in microseconds
  */
-microseconds TimeSort(vector<string>& vect, int tests) {
-    //accumulator to sum durations accross multiple tests
-    microseconds totalTime(0);
+vector<microseconds> TimeSort(vector<string>& vect, int tests) {
+    //vector stores results of each test
+    vector<microseconds> totalTimes;
 
     //test with a dummy vector for all but last test
     for (int i = 0; i < tests - 1; i++) {
@@ -311,7 +315,7 @@ microseconds TimeSort(vector<string>& vect, int tests) {
         sort(testVect.begin(), testVect.end());
         auto end = high_resolution_clock::now();
 
-        totalTime += duration_cast<microseconds>(end - start);
+        totalTimes.push_back(duration_cast<microseconds>(end - start));
     }
 
     //sort the actual vector for the final test
@@ -319,9 +323,9 @@ microseconds TimeSort(vector<string>& vect, int tests) {
     sort(vect.begin(), vect.end());
     auto end = high_resolution_clock::now();
 
-    totalTime += duration_cast<microseconds>(end - start);
+    totalTimes.push_back(duration_cast<microseconds>(end - start));
 
-    return totalTime;
+    return totalTimes;
 }
 
 /**
