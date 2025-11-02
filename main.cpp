@@ -70,9 +70,9 @@ int main() {
     for (int i = 0; i < TESTS; i++) {
         //Runs races and store in 3D array
         races.at(0) = ReadRace(list, vect, set, FILENAME, READ_TESTS);
-        races.at(1) = SortRace(list, vect, SORT_TESTS);
-        races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
-        races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
+        //races.at(1) = SortRace(list, vect, SORT_TESTS);
+        //races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
+        //races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
 
         OutputRace({"Operation", "List", "Vector", "Set"});
 
