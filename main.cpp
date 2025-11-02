@@ -46,6 +46,7 @@ void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
 /**
  * Calls read race function multiple times and appends each resulting time to a compiled 2d vector of all durations
+ * Produces more consistent times than looping within the ReadRace function
  */
 vector<vector<microseconds>> TestReadRace(list<string>& testList, vector<string>& testVect, set<string>& testSet, string filename, int tests) {
     vector<vector<microseconds>> compiledDurations(3);
@@ -64,7 +65,7 @@ vector<vector<microseconds>> TestReadRace(list<string>& testList, vector<string>
 int main() {
     const string FILENAME = "codes.txt";
     const int TESTS = 10;
-    const int READ_TESTS = 1;
+    const int READ_TESTS = 10;
     const int SORT_TESTS = 1;
     const int INSERTION_TESTS = 1;
     const int DELETION_TESTS = 1;
@@ -84,14 +85,13 @@ int main() {
                  
      */
 
-    for (int i = 0; i < 2; i++) {
-        TestReadRace(list, FILENAME, 10);
-    }
     
     vector<vector<vector<microseconds>>> races(4);
     for (int i = 0; i < TESTS; i++) {
         //Runs races and store in 3D array
-        races.at(0) = ReadRace(list, vect, set, FILENAME, READ_TESTS);
+        races.at(0) = TestReadRace(list, vect, set, FILENAME, READ_TESTS);
+
+        //races.at(0) = ReadRace(list, vect, set, FILENAME, READ_TESTS);
         //races.at(1) = SortRace(list, vect, SORT_TESTS);
         //races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
         //races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
