@@ -45,32 +45,10 @@ vector<vector<microseconds>> DeleteRace(list<string>&list, vector<string>& vect,
 void OutputRace(vector<microseconds> durations, string raceName, int spacing = DEFAULT_SPACING);
 void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
-/**
- * Calls read race function multiple times and appends each resulting time to a compiled 2d vector of all durations
- * Produces more consistent times than looping within the ReadRace function
- */
-vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVect, set<string>& testSet, string filename, int tests) {
-    vector<vector<microseconds>> compiledDurations(3);
-    for (int i = 0; i < tests; i++) {
-        //call the race and input into a dummy vector
-        if (i == 0) {
-            vector<vector<microseconds>> durations = ReadRace(testList, testVect, testSet, filename, 1);
-        } else {
-            
-        }
-        
-        //add the result of each race into compiled durations vector
-        for (int j = 0; j < durations.size(); j++) {
-            compiledDurations.at(j).push_back(durations.at(j).front());
-        }
-    }
-    return compiledDurations;
-}
-
 int main() {
     const string FILENAME = "codes.txt";
-    const int TESTS = 10;
-    const int READ_TESTS = 10;
+    const int TESTS = 3;
+    const int READ_TESTS = 5;
     const int SORT_TESTS = 1;
     const int INSERTION_TESTS = 1;
     const int DELETION_TESTS = 1;
@@ -92,12 +70,12 @@ int main() {
 
     
     vector<vector<vector<microseconds>>> races(4);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < TESTS; i++) {
         //Runs races and store in 3D array
         races.at(0) = ReadRace(list, vect, set, FILENAME, READ_TESTS);
-        //races.at(1) = SortRace(list, vect, SORT_TESTS);
-        //races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
-        //races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
+        races.at(1) = SortRace(list, vect, SORT_TESTS);
+        races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
+        races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
 
         OutputRace({"Operation", "List", "Vector", "Set"});
 
@@ -232,6 +210,32 @@ vector<vector<microseconds>> SortRace(list<string>& list, vector<string>& vect, 
             TimeSort(vect, tests), 
             vector<microseconds>(tests, static_cast<microseconds>(-1)) //initialize a dummy vector and set all times to -1
         };
+}
+
+/**
+ * Calls read race function multiple times and appends each resulting time to a compiled 2d vector of all durations
+ * Produces more consistent times than looping within the ReadRace function
+ */
+vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& testVect, set<string>& testSet, string filename, int tests) {
+    vector<vector<microseconds>> compiledDurations(3);
+    for (int i = 0; i < tests; i++) {
+        vector<vector<microseconds>> durations(3);
+
+        if (i == 0) { //input items into parameter list/vector/set the first race
+            durations = ReadRace(testList, testVect, testSet, filename);   //call race function for a single race
+        } else {      //input items into dummy list/vecotr/set for subsequent races
+            list<string> dummyList;
+            vector<string> dummyVector;
+            set<string> dummySet;
+            durations = ReadRace(testList, testVect, testSet, filename);
+        }
+        
+        //add the result of each race into compiled durations vector
+        for (int j = 0; j < durations.size(); j++) {
+            compiledDurations.at(j).push_back(durations.at(j).front());
+        }
+    }
+    return compiledDurations;
 }
 
 /**
