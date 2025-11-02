@@ -47,10 +47,10 @@ void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 int main() {
     const string FILENAME = "codes.txt";
     const int TESTS = 10;
-    const int READ_TESTS = TESTS;
-    const int SORT_TESTS = TESTS;
-    const int INSERTION_TESTS = TESTS;
-    const int DELETION_TESTS = TESTS;
+    const int READ_TESTS = 1;
+    const int SORT_TESTS = 1;
+    const int INSERTION_TESTS = 1;
+    const int DELETION_TESTS = 1;
     const int SPACING = 15;
 
     list<string> list;
@@ -67,52 +67,53 @@ int main() {
                  
      */
     vector<vector<vector<microseconds>>> races(4);
-    
-    //Runs races and store in 3D array
-    races.at(0) = ReadRace(list, vect, set, FILENAME, READ_TESTS);
-    races.at(1) = SortRace(list, vect, SORT_TESTS);
-    races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
-    races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
+    for (int i = 0; i < TESTS; i++) {
+        //Runs races and store in 3D array
+        races.at(0) = ReadRace(list, vect, set, FILENAME, READ_TESTS);
+        races.at(1) = SortRace(list, vect, SORT_TESTS);
+        races.at(2) = InsertRace(list, vect, set, "TESTCODE", INSERTION_TESTS);
+        races.at(3) = DeleteRace(list, vect, set, DELETION_TESTS);
 
-    OutputRace({"Operation", "List", "Vector", "Set"});
+        OutputRace({"Operation", "List", "Vector", "Set"});
 
-    for (int raceType = 0; raceType < races.size(); raceType++) {
-        switch (raceType) {
-            case 0:
-                cout << setw(SPACING) <<  left << "Read:";
-                break; 
-            case 1:
-                cout << setw(SPACING) <<  left << "Sort:";
-                break;
-            case 2:
-                cout << setw(SPACING) <<  left << "Insert:";
-                break;
-            case 3:
-                cout << setw(SPACING) <<  left << "Delete:";
-                break;
-        }
-        for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
-            //average out durations for each test
-            long long averageDuration = 0;
-            cout << "{";
-            for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
-                long long duration = races.at(raceType).at(datatype).at(i).count();
-                cout << duration << ", ";
-                averageDuration += duration;
+        for (int raceType = 0; raceType < races.size(); raceType++) {
+            switch (raceType) {
+                case 0:
+                    cout << setw(SPACING) <<  left << "Read:";
+                    break; 
+                case 1:
+                    cout << setw(SPACING) <<  left << "Sort:";
+                    break;
+                case 2:
+                    cout << setw(SPACING) <<  left << "Insert:";
+                    break;
+                case 3:
+                    cout << setw(SPACING) <<  left << "Delete:";
+                    break;
             }
-            cout << "}";
+            for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
+                //average out durations for each test
+                long long averageDuration = 0;
+                cout << "{";
+                for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
+                    long long duration = races.at(raceType).at(datatype).at(i).count();
+                    cout << duration << ", ";
+                    averageDuration += duration;
+                }
+                cout << "}";
 
-            //if the duration is negative, it has been set to a fixed value, so set to -1
-            if (averageDuration < 0) {
-                averageDuration = -1;
-            } else {
-                //otherwise calculate average as normal
-                //note integer division; since durations are generally long, will not matter much
-                averageDuration /= races.at(raceType).at(datatype).size();
+                //if the duration is negative, it has been set to a fixed value, so set to -1
+                if (averageDuration < 0) {
+                    averageDuration = -1;
+                } else {
+                    //otherwise calculate average as normal
+                    //note integer division; since durations are generally long, will not matter much
+                    averageDuration /= races.at(raceType).at(datatype).size();
+                }
+                cout << setw(SPACING) << left << averageDuration;
             }
-            cout << setw(SPACING) << left << averageDuration;
+            cout << endl;
         }
-        cout << endl;
     }
 
     return 0;
@@ -233,24 +234,23 @@ vector<vector<microseconds>> ReadRace(list<string>& testList, vector<string>& te
         vector<string> dummyVect;
         set<string> dummySet;
 
-        //Reset file stream to beginning
-        infile.clear();
-        infile.seekg(0);
         //Time read operation for the list
         //Use a dummy list for repeat tests
         durations.at(0).push_back(Read((i == 0 ? testList : dummyList), infile)); 
-
-
+        //Reset file stream to beginning
         infile.clear();
         infile.seekg(0);
+
+
         //Time read operation for vector
         durations.at(1).push_back(Read((i == 0) ? testVector : dummyVect, infile));
-        
         infile.clear();
         infile.seekg(0);
+        
         //Time read operation for set
         durations.at(2).push_back(Read((i == 0) ? testSet : dummySet, infile));
-
+        infile.clear();
+        infile.seekg(0);
     }
     infile.close();
 
