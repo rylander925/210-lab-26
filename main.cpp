@@ -46,10 +46,11 @@ void OutputRace(vector<string> names, int spacing = DEFAULT_SPACING);
 
 int main() {
     const string FILENAME = "codes.txt";
-    const int READ_TESTS = 2;
-    const int SORT_TESTS = 2;
-    const int INSERTION_TESTS = 2;
-    const int DELETION_TESTS = 2;
+    const int TESTS = 1;
+    const int READ_TESTS = TESTS;
+    const int SORT_TESTS = TESTS;
+    const int INSERTION_TESTS = TESTS;
+    const int DELETION_TESTS = TESTS;
     const int SPACING = 15;
 
     list<string> list;
@@ -91,11 +92,20 @@ int main() {
                 break;
         }
         for (int datatype = 0; datatype < races.at(raceType).size(); datatype++) {
+            //average out durations for each test
             long long averageDuration = 0;
             for (int i = 0; i < races.at(raceType).at(datatype).size(); i++) {
                 averageDuration += races.at(raceType).at(datatype).at(i).count();
             }
-            averageDuration /= races.at(raceType).at(datatype).size();
+
+            //if the duration is negative, it has been set to a fixed value, so set to -1
+            if (averageDuration < 0) {
+                averageDuration = -1;
+            } else {
+                //otherwise calculate average as normal
+                //note integer division; since durations are generally long, will not matter much
+                averageDuration /= races.at(raceType).at(datatype).size();
+            }
             cout << setw(SPACING) << left << averageDuration;
         }
         cout << endl;
